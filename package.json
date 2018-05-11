@@ -1,0 +1,34 @@
+{
+  "name": "@bitcointrade/react-launch-darkly",
+  "version": "0.1.0",
+  "description": "A ReactJS wrapper for LaunchDarkly",
+  "repository": "git@github.com:cryptocurrencytrader/react-launch-darkly.git",
+  "author": "Rafael Tavares <rafael@tavares.email>",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "run-publish": "tslint -c tslint.json 'src/**/*.ts' && rimraf .publishing && tsc --outDir .publishing && copy package.json .publishing && copy README.md .publishing && npm publish .publishing",
+    "test": "tslint -c tslint.json 'src/**/*.ts' && tsc"
+  },
+  "dependencies": {
+    "@bitcointrade/react-helpers": "^1.0.0",
+    "@types/events": "^1.2.0",
+    "@types/lodash": "^4.14.108",
+    "@types/react": "^16.3.14",
+    "@types/shortid": "^0.0.29",
+    "lodash": "^4.17.10",
+    "shortid": "^2.2.8",
+    "tslib": "^1.9.0"
+  },
+  "devDependencies": {
+    "ldclient-js": "^1.7.3",
+    "react": "^16.3.2",
+    "tslint": "^5.10.0",
+    "tslint-react": "^3.6.0",
+    "typescript": "^2.8.3"
+  },
+  "peerDependencies": {
+    "ldclient-js": "^1.7.3",
+    "react": "^16.3.0"
+  }
+}
