@@ -1,6 +1,6 @@
 {
   "name": "@bitcointrade/react-launch-darkly",
-  "version": "0.1.0",
+  "version": "1.0.0-alpha",
   "description": "A ReactJS wrapper for LaunchDarkly",
   "repository": "git@github.com:cryptocurrencytrader/react-launch-darkly.git",
   "author": "Rafael Tavares <rafael@tavares.email>",
@@ -21,8 +21,10 @@
     "tslib": "^1.9.0"
   },
   "devDependencies": {
+    "copy": "^0.3.2",
     "ldclient-js": "^1.7.3",
     "react": "^16.3.2",
+    "rimraf": "^2.6.2",
     "tslint": "^5.10.0",
     "tslint-react": "^3.6.0",
     "typescript": "^2.8.3"
