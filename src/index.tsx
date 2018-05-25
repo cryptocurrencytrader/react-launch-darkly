@@ -6,6 +6,7 @@ import { launchDarklyHOC, ProviderValue } from "./context";
 
 export interface LaunchDarklyFlagProps {
   defaultValue?: any;
+  expectedValue?: any;
   featureName: string;
 }
 
@@ -15,7 +16,7 @@ interface State {
   showFeature: boolean;
 }
 
-class LaunchDarklyFlag extends React.Component<InnerProps, State> {
+class LaunchDarklyFlag extends React.Component<InnerProps> {
   public state: State = {
     showFeature: false,
   };
@@ -24,35 +25,44 @@ class LaunchDarklyFlag extends React.Component<InnerProps, State> {
     const { client, clientReady } = this.props.context;
 
     if (clientReady) {
-      this.setVariation();
+      this.setVariation(this.props.context.client!);
+      client!.on("change", this.clientChangeHandler);
     }
-
-    client.on("change", this.clientChangeHandler);
   }
 
   public componentDidUpdate(prevProps: InnerProps) {
+    if (this.props.context.client && this.props.context.client !== prevProps.context.client) {
+      this.props.context.client.on("change", this.clientChangeHandler);
+    }
+
     if (
-      this.props.context.clientReady !== prevProps.context.clientReady ||
-      this.props.featureName !== prevProps.featureName ||
-      this.props.defaultValue !== prevProps.defaultValue
+      this.props.context.clientReady &&
+      (
+        this.props.context.clientReady !== prevProps.context.clientReady ||
+        this.props.featureName !== prevProps.featureName ||
+        this.props.defaultValue !== prevProps.defaultValue
+      )
     ) {
-      this.setVariation();
+      this.setVariation(this.props.context.client!);
     }
   }
 
   public componentWillUnmount() {
     const { client } = this.props.context;
-    client.off("change", this.clientChangeHandler);
+
+    if (client) {
+      client.off("change", this.clientChangeHandler);
+    }
   }
 
   private clientChangeHandler = (): void => {
-    this.setVariation();
+    this.setVariation(this.props.context.client!);
   }
 
-  private setVariation(): void {
-    const { context: { client }, defaultValue = false } = this.props;
-    const showFeature = client.variation(this.props.featureName, defaultValue);
-    this.setState({ showFeature: !!showFeature });
+  private setVariation(client: Pick<ProviderValue, "client">["client"] & {}): void {
+    const { defaultValue = false, expectedValue = true } = this.props;
+    const value = client.variation(this.props.featureName, defaultValue);
+    this.setState({ showFeature: value === expectedValue });
   }
 
   public render() {
@@ -64,5 +74,5 @@ class LaunchDarklyFlag extends React.Component<InnerProps, State> {
   }
 }
 
-const LaunchDarklyFlagWithConsumer: any = launchDarklyHOC()(LaunchDarklyFlag);
-export default LaunchDarklyFlagWithConsumer as React.ComponentClass<LaunchDarklyFlagProps>;
+const LaunchDarklyFlagWithConsumer: React.ComponentClass<LaunchDarklyFlagProps> = launchDarklyHOC()(LaunchDarklyFlag);
+export default LaunchDarklyFlagWithConsumer;

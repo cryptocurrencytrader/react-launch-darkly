@@ -1,6 +1,5 @@
 import LaunchDarkly from "ldclient-js";
 import React from "react";
-import shortid from "shortid";
 
 import { Provider, ProviderValue } from "../context";
 
@@ -9,63 +8,58 @@ export interface LaunchDarklyProps {
   user?: LaunchDarkly.LDUser;
 }
 
-interface State extends Pick<LaunchDarklyProps, "user"> {
+interface State {
   providerValue: ProviderValue;
 }
 
 class LaunchDarklyProvider extends React.Component<LaunchDarklyProps, State> {
-  private componentMounted: boolean = false;
-
-  private componentMountPromise: Promise<void>;
-
-  private componentMountResolver?: () => void;
+  // tslint:disable-next-line:variable-name
+  private _providerValueRef: ProviderValue;
 
   constructor(...args: any[]) {
     // @ts-ignore
     super(...args);
-    const { sdkKey, user = { key: shortid(), anonymous: true } } = this.props;
 
-    const client = LaunchDarkly.initialize(sdkKey, user);
-    client.on("ready", this.clientReadyHandler);
-
-    this.componentMountPromise = new Promise((resolveFn) => {
-      this.componentMountResolver = resolveFn;
-
-      if (this.componentMounted) {
-        this.componentMountResolver();
-      }
-    });
+    this._providerValueRef = { client: undefined, clientReady: false };
 
     this.state = {
-      providerValue: { client, clientReady: false },
-      user,
+      providerValue: { ...this._providerValueRef },
     };
+  }
+
+  public componentDidMount() {
+    if (this.props.user) {
+      this.init(this.props.user);
+    }
   }
 
   public componentDidUpdate(prevProps: LaunchDarklyProps) {
     if (this.props.user && this.props.user !== prevProps.user) {
-       const { client } = this.state.providerValue;
-       client.identify(this.props.user);
+      const { client } = this._providerValueRef;
+
+      if (!client) {
+        this.init(this.props.user);
+      } else {
+        client.identify(this.props.user);
+      }
     }
   }
 
-  public componentDidMount() {
-    this.componentMounted = true;
+  private init(user: LaunchDarkly.LDUser): LaunchDarkly.LDClient {
+    const { sdkKey } = this.props;
 
-    if (this.componentMountResolver) {
-      this.componentMountResolver();
-    }
+    const client = LaunchDarkly.initialize(sdkKey, user!);
+    this._providerValueRef.client = client;
+
+    client.on("ready", this.clientReadyHandler);
+    this.setState({ providerValue: { ...this._providerValueRef } });
+
+    return client;
   }
 
   private clientReadyHandler = async (): Promise<void> => {
-    await this.componentMountPromise;
-
-    this.setState({
-      providerValue: {
-        ...this.state.providerValue,
-        clientReady: true,
-      },
-    });
+    this._providerValueRef.clientReady = true;
+    this.setState({ providerValue: { ...this._providerValueRef } });
   }
 
   public render() {

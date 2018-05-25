@@ -3,12 +3,15 @@ import React from "react";
 
 import createConsumerHOC from "@bitcointrade/react-helpers/createConsumerHOC";
 
-const { Consumer, Provider } = React.createContext({});
-
 export interface ProviderValue {
-  client: LDClient;
+  client: LDClient | undefined;
   clientReady: boolean;
 }
 
+const { Consumer, Provider } = React.createContext<ProviderValue>({
+  client: undefined,
+  clientReady: false,
+});
+
 export { Provider };
-export const launchDarklyHOC = createConsumerHOC<ProviderValue>(Consumer);
+export const launchDarklyHOC = createConsumerHOC<ProviderValue>(Consumer, "LaunchDarkly");
