@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@bitcointrade/react-helpers@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@bitcointrade/react-helpers/-/react-helpers-1.0.0.tgz#fcad5a235ce914450a8aabf02deabb37300da869"
+"@bitcointrade/react-helpers@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@bitcointrade/react-helpers/-/react-helpers-1.0.1.tgz#bb5b19bd5304f47a8ee5f0a12d7887ab3bb45147"
   dependencies:
     "@types/react" "^16.3.13"
     hoist-non-react-statics "^2.5.0"
