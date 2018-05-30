@@ -1,5 +1,6 @@
 import LaunchDarkly from "ldclient-js";
 import React from "react";
+import shallowEqual from "shallowequal";
 
 import { Provider, ProviderValue } from "../context";
 
@@ -34,7 +35,7 @@ class LaunchDarklyProvider extends React.Component<LaunchDarklyProps, State> {
   }
 
   public componentDidUpdate(prevProps: LaunchDarklyProps) {
-    if (this.props.user && this.props.user !== prevProps.user) {
+    if (this.props.user && !shallowEqual(this.props.user, prevProps.user)) {
       const { client } = this._providerValueRef;
 
       if (!client) {
