@@ -15,16 +15,16 @@ interface State {
 
 class LaunchDarklyProvider extends React.Component<LaunchDarklyProps, State> {
   // tslint:disable-next-line:variable-name
-  private _providerValueRef: ProviderValue;
+  private _providerValueClone: ProviderValue;
 
   constructor(...args: any[]) {
     // @ts-ignore
     super(...args);
 
-    this._providerValueRef = { client: undefined, clientReady: false };
+    this._providerValueClone = { client: undefined, clientReady: false };
 
     this.state = {
-      providerValue: { ...this._providerValueRef },
+      providerValue: { ...this._providerValueClone },
     };
   }
 
@@ -36,7 +36,7 @@ class LaunchDarklyProvider extends React.Component<LaunchDarklyProps, State> {
 
   public componentDidUpdate(prevProps: LaunchDarklyProps) {
     if (this.props.user && !shallowEqual(this.props.user, prevProps.user)) {
-      const { client } = this._providerValueRef;
+      const { client } = this._providerValueClone;
 
       if (!client) {
         this.init(this.props.user);
@@ -46,21 +46,20 @@ class LaunchDarklyProvider extends React.Component<LaunchDarklyProps, State> {
     }
   }
 
-  private init(user: LaunchDarkly.LDUser): LaunchDarkly.LDClient {
+  private init(user: LaunchDarkly.LDUser): void {
     const { sdkKey } = this.props;
 
     const client = LaunchDarkly.initialize(sdkKey, user!);
-    this._providerValueRef.client = client;
+    this._providerValueClone.client = client;
 
     client.on("ready", this.clientReadyHandler);
-    this.setState({ providerValue: { ...this._providerValueRef } });
 
-    return client;
+    this.setState({ providerValue: { ...this._providerValueClone } });
   }
 
   private clientReadyHandler = async (): Promise<void> => {
-    this._providerValueRef.clientReady = true;
-    this.setState({ providerValue: { ...this._providerValueRef } });
+    this._providerValueClone.clientReady = true;
+    this.setState({ providerValue: { ...this._providerValueClone } });
   }
 
   public render() {

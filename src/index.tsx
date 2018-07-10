@@ -1,8 +1,10 @@
 import React from "react";
 
+import { launchDarklyHOC, ProviderValue } from "./context";
+import LaunchDarklyObserver from "./Observer";
+
 export { default as LaunchDarklyProvider } from "./Provider";
 export * from "./Provider";
-import { launchDarklyHOC, ProviderValue } from "./context";
 
 export interface LaunchDarklyFlagProps {
   defaultValue?: any;
@@ -22,19 +24,14 @@ class LaunchDarklyFlag extends React.Component<InnerProps> {
   };
 
   public componentDidMount() {
-    const { client, clientReady } = this.props.context;
+    const { clientReady } = this.props.context;
 
     if (clientReady) {
-      this.setVariation(this.props.context.client!);
-      client!.on("change", this.clientChangeHandler);
+      this.setVariation();
     }
   }
 
   public componentDidUpdate(prevProps: InnerProps) {
-    if (this.props.context.client && this.props.context.client !== prevProps.context.client) {
-      this.props.context.client.on("change", this.clientChangeHandler);
-    }
-
     if (
       this.props.context.clientReady &&
       (
@@ -43,25 +40,18 @@ class LaunchDarklyFlag extends React.Component<InnerProps> {
         this.props.defaultValue !== prevProps.defaultValue
       )
     ) {
-      this.setVariation(this.props.context.client!);
-    }
-  }
-
-  public componentWillUnmount() {
-    const { client } = this.props.context;
-
-    if (client) {
-      client.off("change", this.clientChangeHandler);
+      this.setVariation();
     }
   }
 
   private clientChangeHandler = (): void => {
-    this.setVariation(this.props.context.client!);
+    this.setVariation();
   }
 
-  private setVariation(client: Pick<ProviderValue, "client">["client"] & {}): void {
-    const { defaultValue = false, expectedValue = true } = this.props;
-    const value = client.variation(this.props.featureName, defaultValue);
+  private setVariation(): void {
+    const { defaultValue = false, expectedValue = true, context: { client } } = this.props;
+    const value = client!.variation(this.props.featureName, defaultValue);
+
     this.setState({ showFeature: value === expectedValue });
   }
 
@@ -69,6 +59,11 @@ class LaunchDarklyFlag extends React.Component<InnerProps> {
     return (
       <>
         {this.state.showFeature ? this.props.children : null}
+
+        <LaunchDarklyObserver
+          featureName={this.props.featureName}
+          onChange={this.clientChangeHandler}
+        />
       </>
     );
   }

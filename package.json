@@ -7,8 +7,9 @@
   "license": "MIT",
   "private": false,
   "scripts": {
+    "build": "tsc",
     "run-publish": "tslint -c tslint.json 'src/**/*.ts' && rimraf .publishing && tsc --outDir .publishing && copy package.json .publishing && copy README.md .publishing && npm publish .publishing",
-    "test": "tslint -c tslint.json 'src/**/*.ts' && tsc"
+    "test": "tslint -c tslint.json 'src/**/*.ts' && tsc --noEmit"
   },
   "dependencies": {
     "@bitcointrade/react-helpers": "^1.0.1",
