@@ -1,4 +1,4 @@
-import LaunchDarkly from "ldclient-js";
+import { initialize, LDUser } from "ldclient-js";
 import React from "react";
 import shallowEqual from "shallowequal";
 
@@ -6,7 +6,7 @@ import { Provider, ProviderValue } from "../context";
 
 export interface LaunchDarklyProps {
   sdkKey: string;
-  user?: LaunchDarkly.LDUser;
+  user?: LDUser;
 }
 
 interface State {
@@ -46,10 +46,10 @@ class LaunchDarklyProvider extends React.Component<LaunchDarklyProps, State> {
     }
   }
 
-  private init(user: LaunchDarkly.LDUser): void {
+  private init(user: LDUser): void {
     const { sdkKey } = this.props;
 
-    const client = LaunchDarkly.initialize(sdkKey, user!);
+    const client = initialize(sdkKey, user!);
     this._providerValueClone.client = client;
 
     client.on("ready", this.clientReadyHandler);
