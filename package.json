@@ -1,6 +1,6 @@
 {
   "name": "@bitcointrade/react-launch-darkly",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A ReactJS wrapper for LaunchDarkly",
   "repository": "git@github.com:cryptocurrencytrader/react-launch-darkly.git",
   "author": "Rafael Tavares <rafael@tavares.email>",
